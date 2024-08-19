@@ -1,10 +1,9 @@
 [
-  import_deps: [:ecto, :phoenix, :ecto_enum, :eggnog, :grpc],
+  import_deps: [:ecto, :phoenix],
   inputs: [
     "*.{heex,ex,exs}",
     "priv/*/seeds.exs",
-    "{config,lib,test}/**/*.{heex,ex,exs}",
-    "storybook/**/*.exs"
+    "{config,lib,test}/**/*.{heex,ex,exs}"
   ],
   # https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.HTMLFormatter.html
   # VSCode frens might need additional configuration: https://pragmaticstudio.com/tutorials/formatting-heex-templates-in-vscode

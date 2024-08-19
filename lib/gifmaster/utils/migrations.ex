@@ -23,7 +23,7 @@ defmodule Gifmaster.Utils.Migrations do
   defmacro __using__(_opts) do
     quote do
       use Ecto.Migration
-      import Portal.Utils.Migrations
+      import Gifmaster.Utils.Migrations
     end
   end
 end

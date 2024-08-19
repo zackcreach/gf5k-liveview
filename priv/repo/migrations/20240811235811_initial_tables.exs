@@ -10,5 +10,12 @@ defmodule Gifmaster.Repo.Migrations.InitialTables do
 
       timestamps()
     end
+
+    create table(:tags) do
+      id :tag
+      add :name, :string
+
+      timestamps()
+    end
   end
 end
