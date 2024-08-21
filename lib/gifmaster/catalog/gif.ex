@@ -1,5 +1,6 @@
-defmodule Gifmaster.Gifs do
+defmodule Gifmaster.Catalog.Gif do
   use Ecto.Schema
+  use Gifmaster.Schema
 
   import Ecto.Changeset
 
@@ -7,6 +8,8 @@ defmodule Gifmaster.Gifs do
     field :name, :string
     field :file, :map
     field :tags, {:array, :string}
+
+    timestamps()
   end
 
   def changeset(gif, params \\ %{}) do

@@ -1,10 +1,13 @@
-defmodule Gifmaster.Tags do
+defmodule Gifmaster.Catalog.Tag do
   use Ecto.Schema
+  use Gifmaster.Schema
 
   import Ecto.Changeset
 
   schema "tags" do
     field :name, :string
+
+    timestamps()
   end
 
   def changeset(tag, params \\ %{}) do
