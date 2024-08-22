@@ -3,17 +3,17 @@ defmodule Gifmaster.Repo.Migrations.InitialTables do
 
   def change do
     create table(:gifs) do
-      id :gif
-      add :name, :string
-      add :file, :map 
-      add :tags, {:array, :string} 
+      id(:gif)
+      add(:name, :string)
+      add(:file, :map)
+      add(:tags, {:array, :string})
 
       timestamps()
     end
 
     create table(:tags) do
-      id :tag
-      add :name, :string
+      id(:tag)
+      add(:name, :string)
 
       timestamps()
     end
