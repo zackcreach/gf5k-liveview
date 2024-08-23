@@ -22,4 +22,9 @@ defmodule Gifmaster.Catalog do
   def delete_gif(id) do
     CatalogRepo.delete_gif(id)
   end
+
+  # tags
+  def get_tags() do
+    CatalogRepo.get_tags()
+  end
 end
