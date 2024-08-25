@@ -65,6 +65,10 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :gifmaster, Infra.ImageProvider,
+    access_key: System.get_env("AWS_ACCESS_KEY"),
+    secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
