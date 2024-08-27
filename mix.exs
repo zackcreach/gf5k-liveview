@@ -37,6 +37,7 @@ defmodule Gifmaster.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:ecto_sql, "~> 3.10"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
+      {:exsync, "~> 0.4", only: :dev},
       {:finch, "~> 0.13"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
@@ -56,7 +57,8 @@ defmodule Gifmaster.MixProject do
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:tesla, "~> 1.12.1"}
+      {:tesla, "~> 1.12.1"},
+      {:tiny_maps, "~> 3.0"}
     ]
   end
 
