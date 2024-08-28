@@ -18,7 +18,11 @@ defmodule Gifmaster.Repo.Migrations.CreateUsersAuthTables do
 
     create table(:users_tokens) do
       id(:token)
-      add(:user_id, references(:users, on_delete: :delete_all, type: :text, column: :id), null: false)
+
+      add(:user_id, references(:users, on_delete: :delete_all, type: :text, column: :id),
+        null: false
+      )
+
       add(:token, :binary, null: false)
       add(:context, :string, null: false)
       add(:sent_to, :string)

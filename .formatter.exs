@@ -11,4 +11,7 @@
   subdirectories: ["priv/*/migrations"],
   line_length: 120,
   heex_line_length: 300
+  # add function names to list below that you don't want parens 
+  # (e.g. [maybe_check_price: 2 OR :* for multiple arrities] `maybe_check_price :flat %{id: id}`)
+  # locals_without_parens: []
 ]

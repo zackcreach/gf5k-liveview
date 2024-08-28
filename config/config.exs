@@ -22,8 +22,7 @@ config :gifmaster, GifmasterWeb.Endpoint,
   pubsub_server: Gifmaster.PubSub,
   live_view: [signing_salt: "jChJG7PL"]
 
-config :gifmaster, Gifmaster.Repo,
-  migration_primary_key: false
+config :gifmaster, Gifmaster.Repo, migration_primary_key: false
 
 # Configures the mailer
 #

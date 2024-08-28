@@ -65,6 +65,9 @@ config :gifmaster, GifmasterWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :gifmaster, dev_routes: true
 
+# Global settings
+config :gifmaster, :base_url, "http://localhost:4000"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 

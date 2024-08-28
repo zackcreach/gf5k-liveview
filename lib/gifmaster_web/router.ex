@@ -2,6 +2,7 @@ defmodule GifmasterWeb.Router do
   use GifmasterWeb, :router
 
   import GifmasterWeb.UserAuth
+  import GifmasterWeb.Plugs
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -11,6 +12,7 @@ defmodule GifmasterWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug :assign_url_helpers
   end
 
   pipeline :api do
@@ -20,7 +22,9 @@ defmodule GifmasterWeb.Router do
   scope "/", GifmasterWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :public_routes, on_mount: [{GifmasterWeb.UserAuth, :mount_current_user}, {GifmasterWeb.Hooks, :global}] do
+      live "/", HomeLive
+    end
   end
 
   # Other scopes may use custom stacks.
