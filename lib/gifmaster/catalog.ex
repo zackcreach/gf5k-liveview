@@ -7,6 +7,10 @@ defmodule Gifmaster.Catalog do
     CatalogRepo.get_gif(id)
   end
 
+  def get_gifs(search) do
+    CatalogRepo.get_gifs(search)
+  end
+
   def get_gifs() do
     CatalogRepo.get_gifs()
   end

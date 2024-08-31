@@ -6,6 +6,8 @@ defmodule Gifmaster.Catalog.Tag do
   schema "tags" do
     field :name, :string
 
+    many_to_many :gifs, Gifmaster.Catalog.Gif, join_through: "gif_tags"
+
     timestamps()
   end
 

@@ -10,7 +10,7 @@
 
     <.live_title><%= assigns[:title] || "Gifmaster 5000" %></.live_title>
 
-    <meta name="title" content={@title} />
+    <meta name="title" content={assigns[:title] || "Gifmaster 5000"} />
     <meta name="description" content={@description} />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="og:title" content={@title} />
