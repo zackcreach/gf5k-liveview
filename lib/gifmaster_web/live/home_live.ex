@@ -3,14 +3,12 @@ defmodule GifmasterWeb.HomeLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(
-        title: "Gifmaster 5000 Catalog",
-        description: "The best gifs you ever did see"
-      )
-
-    {:ok, socket}
+    socket
+    |> assign(
+      title: "Gifmaster 5000 Catalog",
+      description: "The best gifs you ever did see"
+    )
+    |> ok()
   end
 
   @impl true

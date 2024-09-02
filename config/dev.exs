@@ -59,7 +59,8 @@ config :gifmaster, GifmasterWeb.Endpoint,
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/gifmaster_web/(controllers|live|components)/.*(ex|heex)$"
-    ]
+    ],
+    web_console_logger: true
   ]
 
 # Enable dev routes for dashboard and mailbox
