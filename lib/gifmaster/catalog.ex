@@ -1,5 +1,6 @@
 defmodule Gifmaster.Catalog do
   alias Gifmaster.Repo
+  alias Gifmaster.Catalog.Gif
   alias Gifmaster.Catalog.Repo, as: CatalogRepo
 
   # gifs
@@ -16,11 +17,16 @@ defmodule Gifmaster.Catalog do
   end
 
   def create_gif(gif) do
-    Repo.insert(gif)
+    %Gif{}
+    |> Gif.changeset(gif)
+    |> Repo.insert!()
   end
 
   def edit_gif(gif) do
-    Repo.update(gif)
+    Repo.get(Gif, gif.id)
+    |> Repo.preload(:tags)
+    |> Gif.changeset(gif)
+    |> Repo.update!()
   end
 
   def delete_gif(id) do

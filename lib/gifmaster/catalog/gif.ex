@@ -5,11 +5,12 @@ defmodule Gifmaster.Catalog.Gif do
   import Ecto.Query
 
   alias Gifmaster.Repo
+  alias Gifmaster.Catalog.File
   alias Gifmaster.Catalog.Tag
 
   schema "gifs" do
     field :name, :string
-    field :file, :map
+    embeds_one :file, File, on_replace: :delete
 
     many_to_many :tags, Tag, join_through: "gifs_tags", on_replace: :delete
 
@@ -18,7 +19,8 @@ defmodule Gifmaster.Catalog.Gif do
 
   def changeset(gif, params \\ %{}) do
     gif
-    |> cast(params, [:name, :file])
+    |> cast(params, [:name])
+    |> cast_embed(:file)
     |> validate_required([:name, :file])
     |> put_assoc(:tags, parse_tags(params))
   end
