@@ -16,9 +16,15 @@ module.exports = {
       colors: {
         gold: '#ffa500',
         grey: {
+          DEFAULT: '#555',
+          100: '#F8F8F8',
+          200: '#AAA',
           300: '#555',
           400: '#333',
         },
+      },
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'],
       },
     },
   },

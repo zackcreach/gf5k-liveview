@@ -1,38 +1,38 @@
 <header class="bg-grey-300 pt-6 px-12 pb-3 h-24 flex items-center">
   <img src={~p"/images/logo.png"} alt="Gifmaster Logo" class="w-[400px]" />
 
-  <ul class="absolute top-0 right-0 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end text-white">
-    <%= if assigns[:current_user] do %>
-      <li class="text-[0.8125rem] leading-6">
-        <%= @current_user.email %>
-      </li>
-      <li>
-        <.link href={~p"/users/settings"} class="text-[0.8125rem] leading-6 font-semibold">
-          Settings
-        </.link>
-      </li>
-      <li>
-        <.link href={~p"/users/log_out"} method="delete" class="text-[0.8125rem] leading-6 font-semibold">
-          Log out
-        </.link>
-      </li>
-    <% else %>
-      <li>
-        <.link href={~p"/users/register"} class="text-[0.8125rem] leading-6 font-semibold">
-          Register
-        </.link>
-      </li>
-      <li>
-        <.link href={~p"/users/log_in"} class="text-[0.8125rem] leading-6 font-semibold">
-          Log in
-        </.link>
-      </li>
-    <% end %>
-  </ul>
+  <!-- <ul class="absolute top-0 right-0 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end text-white"> -->
+  <!--   <%= if assigns[:current_user] do %> -->
+  <!--     <li class="text-[0.8125rem] leading-6"> -->
+  <!--       <%= @current_user.email %> -->
+  <!--     </li> -->
+  <!--     <li> -->
+  <!--       <.link href={~p"/users/settings"} class="text-[0.8125rem] leading-6 font-semibold"> -->
+  <!--         Settings -->
+  <!--       </.link> -->
+  <!--     </li> -->
+  <!--     <li> -->
+  <!--       <.link href={~p"/users/log_out"} method="delete" class="text-[0.8125rem] leading-6 font-semibold"> -->
+  <!--         Log out -->
+  <!--       </.link> -->
+  <!--     </li> -->
+  <!--   <% else %> -->
+  <!--     <li> -->
+  <!--       <.link href={~p"/users/register"} class="text-[0.8125rem] leading-6 font-semibold"> -->
+  <!--         Register -->
+  <!--       </.link> -->
+  <!--     </li> -->
+  <!--     <li> -->
+  <!--       <.link href={~p"/users/log_in"} class="text-[0.8125rem] leading-6 font-semibold"> -->
+  <!--         Log in -->
+  <!--       </.link> -->
+  <!--     </li> -->
+  <!--   <% end %> -->
+  <!-- </ul> -->
 </header>
 
 <main class="bg-grey-400 min-h-screen">
-  <div class="mx-auto max-w-2xl">
+  <div class="px-12 py-6">
     <.flash_group flash={@flash} />
     <%= @inner_content %>
   </div>

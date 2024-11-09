@@ -16,8 +16,9 @@ defmodule GifmasterWeb.CoreComponents do
   """
   use Phoenix.Component
 
-  alias Phoenix.LiveView.JS
   import GifmasterWeb.Gettext
+
+  alias Phoenix.LiveView.JS
 
   @doc """
   Renders a modal.
@@ -323,9 +324,9 @@ defmodule GifmasterWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
+          "block w-full bg-transparent border-0 border-b border-b-white/[.33] focus:border-0 focus:border-b focus:border-b-gold focus:shadow-none focus:ring-0 p-3 text-grey-100 font-semibold placeholder:text-grey-200 transition-colors text-lg leading-5",
+          @errors == [] && "",
+          @errors != [] && ""
         ]}
         {@rest}
       />
