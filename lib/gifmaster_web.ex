@@ -17,16 +17,16 @@ defmodule GifmasterWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+  def static_paths, do: ~w(assets fonts robots.txt)
 
   def router do
     quote do
       use Phoenix.Router, helpers: false
 
       # Import common connection and controller functions to use in pipelines
-      import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+      import Plug.Conn
     end
   end
 
@@ -42,8 +42,8 @@ defmodule GifmasterWeb do
         formats: [:html, :json],
         layouts: [html: GifmasterWeb.Layouts]
 
-      import Plug.Conn
       import GifmasterWeb.Gettext
+      import Plug.Conn
 
       unquote(verified_routes())
     end
@@ -85,10 +85,10 @@ defmodule GifmasterWeb do
   defp html_helpers do
     quote do
       # HTML escaping functionality
-      import Phoenix.HTML
       # Core UI components and translation
       import GifmasterWeb.CoreComponents
       import GifmasterWeb.Gettext
+      import Phoenix.HTML
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
