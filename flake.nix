@@ -11,13 +11,13 @@
         inherit (pkgs.lib) optional optionals;
 
         beamBuilder = pkgs.beam.packagesWith (pkgs.beam.interpreters.erlang_27.override {
-          version = "27.0.1";
-          sha256 = "sha256-Lp6J9eq6RXDi0RRjeVO/CIa4h/m7/fwOp/y0u0sTdFQ=";
+          version = "27.1.2";
+          sha256 = "sha256-urHJMPo9XG+sIBuCaWvEhAcykGxlVSdKKem7vCiMjcg=";
         });
 
         elixir = beamBuilder.elixir.override {
-          version = "1.17.2";
-          sha256 = "sha256-8rb2f4CvJzio3QgoxvCv1iz8HooXze0tWUJ4Sc13dxg=";
+          version = "1.17.3";
+          sha256 = "sha256-7Qo6y0KAQ9lwD4oH+7wQ4W5i6INHIBDN9IQAAsYzNJw=";
         };
       in
       with pkgs;
