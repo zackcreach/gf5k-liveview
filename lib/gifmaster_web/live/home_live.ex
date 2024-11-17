@@ -12,7 +12,7 @@ defmodule GifmasterWeb.HomeLive do
     |> assign(
       title: "Gifmaster 5000 Catalog",
       description: "The best gifs you ever did see",
-      show_gif_upload_modal: true,
+      show_gif_upload_modal: false,
       get_gifs_form: to_form(%{"search" => ""}),
       # Switch out to_form to Catalog.create_gif()
       upload_gif_form:

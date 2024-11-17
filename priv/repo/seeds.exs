@@ -12,34 +12,122 @@
 alias Gifmaster.Catalog
 
 Catalog.create_gif(%{
-  name: "blink 182",
-  tags: ~w(wtf),
+  name: "lil yachty drake",
+  tags: ["of course", "duh", "yea"],
   file: %{
     url: %{
-      relative: "/8e0cefa5-718d-4e44-b59e-b45f0b87398b.gif",
-      absolute: "https://gems.gifmaster5000.com/8e0cefa5-718d-4e44-b59e-b45f0b87398b.gif"
+      relative: "/lil-yachty-drake.gif",
+      absolute: "https://gems.gifmaster5000.com/lil-yachty-drake.gif"
     }
   }
 })
 
 Catalog.create_gif(%{
-  name: "jake confused",
-  tags: ~w(wait),
+  name: "kombucha ugh",
+  tags: ~w(ugh indecisive unless well),
   file: %{
     url: %{
-      relative: "c5eaab8a-42b6-4764-b206-8e14842af582.gif",
-      absolute: "https://gems.gifmaster5000.com/c5eaab8a-42b6-4764-b206-8e14842af582.gif"
+      relative: "/kombucha-ugh.gif",
+      absolute: "https://gems.gifmaster5000.com/kombucha-ugh.gif"
     }
   }
 })
 
 Catalog.create_gif(%{
-  name: "chris pratt surprised",
-  tags: ~w(surprised whoa),
+  name: "thunk",
+  tags: ~w(emoji thinking),
   file: %{
     url: %{
-      relative: "d7038fa0-16b1-499b-be97-3188cf4f16d5.gif",
-      absolute: "https://gems.gifmaster5000.com/d7038fa0-16b1-499b-be97-3188cf4f16d5.gif"
+      relative: "/thunk.gif",
+      absolute: "https://gems.gifmaster5000.com/thunk.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "nod beard",
+  tags: ["yes", "of course"],
+  file: %{
+    url: %{
+      relative: "/nod-beard.gif",
+      absolute: "https://gems.gifmaster5000.com/nod-beard.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "blink wtf",
+  tags: ~w(wtf ugh),
+  file: %{
+    url: %{
+      relative: "/blink-wtf.gif",
+      absolute: "https://gems.gifmaster5000.com/blink-wtf.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "oh damn andy",
+  tags: ~w(surprised shocked yes),
+  file: %{
+    url: %{
+      relative: "/oh-damn-andy.gif",
+      absolute: "https://gems.gifmaster5000.com/oh-damn-andy.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "shake nod basketball",
+  tags: ~w(disappointed unless),
+  file: %{
+    url: %{
+      relative: "/shake-nod-basketball.gif",
+      absolute: "https://gems.gifmaster5000.com/shake-nod-basketball.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "banderas",
+  tags: ~w(nice yes beautiful),
+  file: %{
+    url: %{
+      relative: "/banderas.gif",
+      absolute: "https://gems.gifmaster5000.com/banderas.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "jordan wow",
+  tags: ~w(michael wow disappointed),
+  file: %{
+    url: %{
+      relative: "/jordan-wow.gif",
+      absolute: "https://gems.gifmaster5000.com/jordan-wow.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "wtf subway",
+  tags: ~w(phone wtf),
+  file: %{
+    url: %{
+      relative: "/wtf-subway.gif",
+      absolute: "https://gems.gifmaster5000.com/wtf-subway.gif"
+    }
+  }
+})
+
+Catalog.create_gif(%{
+  name: "my man",
+  tags: ~w(denzel washington),
+  file: %{
+    url: %{
+      relative: "/my-man.gif",
+      absolute: "https://gems.gifmaster5000.com/my-man.gif"
     }
   }
 })
