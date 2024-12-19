@@ -5,6 +5,7 @@ defmodule GifmasterWeb.HomeLive do
   use GifmasterWeb, :live_view
 
   alias Gifmaster.Catalog
+  alias Gifmaster.Catalog.Gif
   alias Phoenix.LiveView.AsyncResult
 
   def mount(_params, _session, socket) do
@@ -12,15 +13,9 @@ defmodule GifmasterWeb.HomeLive do
     |> assign(
       title: "Gifmaster 5000",
       description: "The best gifs you ever did see",
-      show_gif_upload_modal: false,
+      show_gif_upload_modal: true,
       get_gifs_form: to_form(%{"search" => ""}),
-      # Switch out to_form to Catalog.create_gif()
-      upload_gif_form:
-        to_form(%{
-          "name" => "",
-          "tags" => [],
-          "file" => %{"url" => %{"relative" => "", "absolute" => ""}}
-        }),
+      gif_changeset: Gif.changeset(%Gif{}),
       gifs: AsyncResult.loading()
     )
     |> assign_async(:gifs, fn -> {:ok, %{gifs: Catalog.get_gifs()}} end)
@@ -49,7 +44,7 @@ defmodule GifmasterWeb.HomeLive do
         Upload Gif
       </h2>
 
-      <.form for={@upload_gif_form}></.form>
+      <.form for={@gif_changeset}></.form>
     </.modal>
     """
   end
