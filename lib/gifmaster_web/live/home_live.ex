@@ -16,7 +16,6 @@ defmodule GifmasterWeb.HomeLive do
       title: "Gifmaster 5000",
       description: "The best gifs you ever did see",
       show_gif_upload_modal: false,
-      uploaded_gifs: [],
       get_gifs_form: to_form(%{"search" => ""}),
       gif_form: to_form(Gif.changeset(%Gif{})),
       gifs: AsyncResult.loading()
@@ -78,7 +77,7 @@ defmodule GifmasterWeb.HomeLive do
   defp presign_upload(entry, socket) do
     uploads = socket.assigns.uploads
     bucket = @public_domain
-    key = entry.client_name
+    key = Recase.to_snake(entry.client_name)
 
     config = %{
       region: "us-east-1",
@@ -102,7 +101,17 @@ defmodule GifmasterWeb.HomeLive do
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
 
-  def handle_event("validate_gif", params, socket) do
+  def handle_event("validate_gif", %{"gif" => %{"name" => name} = params}, socket) do
+    dbg(params)
+
+    params =
+      if length(socket.assigns.uploads.gif.entries) > 0 and name == "" do
+        [%Phoenix.LiveView.UploadEntry{client_name: name}] = socket.assigns.uploads.gif.entries
+        Map.put(params, "name", Regex.replace(~r/\.\w+$/, name, ""))
+      else
+        params
+      end
+
     gif_form =
       %Gif{}
       |> Gif.changeset(params)
