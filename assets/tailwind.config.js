@@ -9,7 +9,7 @@ module.exports = {
   content: [
     './js/**/*.js',
     '../lib/gifmaster_web.ex',
-    '../lib/gifmaster_web/**/*.*ex',
+    '../lib/gifmaster_web/**/*',
   ],
   theme: {
     extend: {
