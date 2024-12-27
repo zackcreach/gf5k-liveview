@@ -6,16 +6,16 @@ defmodule GifmasterWeb.HomeLive do
 
   alias Gifmaster.Catalog
   alias Gifmaster.Catalog.Gif
+  alias Gifmaster.Repo
   alias Phoenix.LiveView.AsyncResult
 
-  @public_domain "gems.gifmaster5000.com"
+  @public_asset_domain "gems.gifmaster5000.com"
 
   def mount(_params, _session, socket) do
     socket
     |> assign(
       title: "Gifmaster 5000",
       description: "The best gifs you ever did see",
-      show_gif_upload_modal: false,
       get_gifs_form: to_form(%{"search" => ""}),
       gif_form: to_form(Gif.changeset(%Gif{})),
       gifs: AsyncResult.loading()
@@ -41,7 +41,7 @@ defmodule GifmasterWeb.HomeLive do
       </.async_result>
     </div>
 
-    <.modal id="gif-upload-modal" show={@show_gif_upload_modal}>
+    <.modal show={@live_action == :upload} id="gif-upload-modal">
       <h2 class="text-2xl font-semibold mb-4">
         Upload
       </h2>
@@ -65,7 +65,7 @@ defmodule GifmasterWeb.HomeLive do
         </div>
 
         <div class="relative mb-4">
-          <.input type="list" label="Tags" field={@gif_form[:tags]} required />
+          <.input type="list" label="Tags (comma separated)" field={@gif_form[:tags]} required />
         </div>
 
         <.button type="submit">Upload</.button>
@@ -75,9 +75,9 @@ defmodule GifmasterWeb.HomeLive do
   end
 
   defp presign_upload(entry, socket) do
+    key = Regex.replace(~r/.+(?=\.\w+)/, entry.client_name, &Recase.to_snake/1)
     uploads = socket.assigns.uploads
-    bucket = @public_domain
-    key = Recase.to_snake(entry.client_name)
+    bucket = @public_asset_domain
 
     config = %{
       region: "us-east-1",
@@ -102,11 +102,10 @@ defmodule GifmasterWeb.HomeLive do
   defp error_to_string(:too_many_files), do: "You have selected too many files"
 
   def handle_event("validate_gif", %{"gif" => %{"name" => name} = params}, socket) do
-    dbg(params)
-
     params =
       if length(socket.assigns.uploads.gif.entries) > 0 and name == "" do
         [%Phoenix.LiveView.UploadEntry{client_name: name}] = socket.assigns.uploads.gif.entries
+        # remove file extension for name suggestion
         Map.put(params, "name", Regex.replace(~r/\.\w+$/, name, ""))
       else
         params
@@ -120,20 +119,25 @@ defmodule GifmasterWeb.HomeLive do
     {:noreply, assign(socket, gif_form: gif_form)}
   end
 
-  def handle_event("save_gif", %{"gif" => %{"name" => name}}, socket) do
+  def handle_event("save_gif", %{"gif" => %{"name" => name, "tags" => tags}}, socket) do
     filename =
       consume_uploaded_entries(socket, :gif, fn %{key: key}, _entry -> key end)
 
     socket =
-      case Catalog.create_gif(%{
-             name: name,
-             file: %{url: %{relative: "/#{filename}", absolute: "https://#{@public_domain}/#{filename}"}}
-           }) do
-        %Gif{} ->
-          put_flash(socket, :info, "Gif saved successfully.")
+      case Repo.transaction(fn ->
+             Catalog.create_gif(%{
+               name: name,
+               tags: String.split(tags, ", "),
+               file: %{url: %{relative: "/#{filename}", absolute: "https://#{@public_asset_domain}/#{filename}"}}
+             })
+           end) do
+        {:ok, %Gif{}} ->
+          socket
+          |> put_flash(:info, "Gif saved successfully.")
+          |> redirect(to: ~p"/")
 
-        _error ->
-          put_flash(socket, :error, "Error saving gif.")
+        {:error, error} ->
+          put_flash(socket, :error, "Error saving gif: #{error}")
       end
 
     {:noreply, socket}
@@ -143,6 +147,12 @@ defmodule GifmasterWeb.HomeLive do
     socket
     |> assign(gifs: AsyncResult.loading())
     |> assign_async(:gifs, fn -> {:ok, %{gifs: Catalog.get_gifs(search)}} end)
+    |> noreply()
+  end
+
+  def handle_event("open_modal", _params, socket) do
+    socket
+    |> redirect(to: ~p"/upload")
     |> noreply()
   end
 end

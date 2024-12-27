@@ -1,4 +1,5 @@
 defmodule GifmasterWeb.UserLoginLive do
+  @moduledoc false
   use GifmasterWeb, :live_view
 
   def render(assigns) do
@@ -38,6 +39,8 @@ defmodule GifmasterWeb.UserLoginLive do
   def mount(_params, _session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :email)
     form = to_form(%{"email" => email}, as: "user")
-    {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
+
+    {:ok, assign(socket, form: form, title: "Login", description: "Login as an existing user"),
+     temporary_assigns: [form: form]}
   end
 end

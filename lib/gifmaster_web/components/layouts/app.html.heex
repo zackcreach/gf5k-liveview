@@ -1,7 +1,9 @@
-<header class="bg-grey-300 pt-6 px-12 pb-3 h-24 flex items-center">
+<header class="bg-grey-300 pt-6 px-12 pb-3 h-24 flex items-center justify-between">
   <a href="/">
     <img src="https://gems.gifmaster5000.com/logo.png" alt="Gifmaster Logo" class="w-[400px]" />
   </a>
+
+  <.button :if={assigns[:current_user]} class="mb-3" phx-click={send(self(), :open_modal)}>Upload</.button>
 
   <!-- <ul class="absolute top-0 right-0 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end text-white"> -->
   <!--   <%= if assigns[:current_user] do %> -->
