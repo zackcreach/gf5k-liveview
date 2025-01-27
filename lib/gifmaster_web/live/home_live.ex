@@ -11,13 +11,13 @@ defmodule GifmasterWeb.HomeLive do
 
   @public_asset_domain "gems.gifmaster5000.com"
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     socket
     |> assign(
       title: "Gifmaster 5000",
       description: "The best gifs you ever did see",
       get_gifs_form: to_form(%{"search" => ""}),
-      gif_form: to_form(Gif.changeset(%Gif{})),
+      gif_form: to_form(get_gif_changeset(params)),
       gifs: AsyncResult.loading()
     )
     |> assign_async(:gifs, fn -> {:ok, %{gifs: Catalog.get_gifs()}} end)
@@ -61,14 +61,17 @@ defmodule GifmasterWeb.HomeLive do
         </p>
 
         <div class="mb-4">
-          <.input label="Name" field={@gif_form[:name]} required />
+          <.input label="Name" field={@gif_form[:name]} name="name" required />
         </div>
 
         <div class="relative mb-4">
-          <.input type="list" label="Tags (comma separated)" field={@gif_form[:tags]} required />
+          <.input type="list" label="Tags (comma separated)" field={@gif_form[:tags]} name="tags" value={maybe_parse_tags(@gif_form)} required />
         </div>
 
-        <.button type="submit">Upload</.button>
+        <div class="flex gap-x-4">
+          <.button type="submit">Upload</.button>
+          <.button :if={@gif_form[:id]} type="button" phx-click="delete_gif">Delete</.button>
+        </div>
       </.form>
     </.modal>
     """
@@ -100,6 +103,26 @@ defmodule GifmasterWeb.HomeLive do
   defp error_to_string(:too_large), do: "Too large"
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
+
+  defp maybe_parse_tags(""), do: ""
+
+  defp maybe_parse_tags(form) do
+    dbg(form[:tags])
+    dbg(Phoenix.HTML.Form.input_value(form, :tags))
+    # String.split(tags, ",")
+  end
+
+  defp get_gif_changeset(%{"gif_id" => gif_id}) do
+    gif_id
+    |> Catalog.get_gif()
+    |> case do
+      %Gif{} = gif -> gif
+      nil -> %Gif{}
+    end
+    |> Gif.changeset()
+  end
+
+  defp get_gif_changeset(_params), do: Gif.changeset(%Gif{})
 
   def handle_event("validate_gif", %{"gif" => %{"name" => name} = params}, socket) do
     params =
@@ -143,6 +166,21 @@ defmodule GifmasterWeb.HomeLive do
     {:noreply, socket}
   end
 
+  def handle_event("delete_gif", %{"gif_id" => gif_id}, socket) do
+    socket =
+      case Catalog.delete_gif(gif_id) do
+        {:ok, %Gif{}} ->
+          socket
+          |> put_flash(:info, "Gif deleted successfully")
+          |> redirect(to: ~p"/")
+
+        {:error, error} ->
+          put_flash(socket, :error, "Error deleting gif: #{error}")
+      end
+
+    {:noreply, socket}
+  end
+
   def handle_event("search", %{"search" => search}, socket) do
     socket
     |> assign(gifs: AsyncResult.loading())
@@ -150,9 +188,17 @@ defmodule GifmasterWeb.HomeLive do
     |> noreply()
   end
 
+  # edit gif
+  def handle_event("open_modal", %{"gif_id" => gif_id}, socket) do
+    socket
+    |> redirect(to: ~p"/upload/#{gif_id}")
+    |> noreply()
+  end
+
+  # upload new gif
   def handle_event("open_modal", _params, socket) do
     socket
-    |> redirect(to: ~p"/upload")
+    |> redirect(to: ~p"/upload/new")
     |> noreply()
   end
 end

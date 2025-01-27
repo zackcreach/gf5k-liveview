@@ -1,7 +1,8 @@
 defmodule Gifmaster.Catalog.Repo do
   import Ecto.Query
 
-  alias Gifmaster.Catalog.{Gif, Tag}
+  alias Gifmaster.Catalog.Gif
+  alias Gifmaster.Catalog.Tag
   alias Gifmaster.Repo
 
   # gifs
@@ -24,24 +25,20 @@ defmodule Gifmaster.Catalog.Repo do
     Repo.all(query)
   end
 
-  def get_gifs() do
-    query = from(g in Gif, order_by: [asc: g.id])
-
-    Repo.all(query)
+  def get_gifs do
+    Repo.all(from(g in Gif, order_by: [asc: g.id]))
   end
 
   defp prefix_search(term), do: String.replace(term, ~r/\W/u, "") <> ":*"
 
-  def delete_gif(id) do
-    gif = get_gif(id)
-
-    Repo.delete(gif)
+  def delete_gif(gif_id) do
+    gif_id
+    |> get_gif()
+    |> Repo.delete()
   end
 
   # tags
-  def get_tags() do
-    query = from(t in Tag, order_by: [asc: t.id])
-
-    Repo.all(query)
+  def get_tags do
+    Repo.all(from(t in Tag, order_by: [asc: t.id]))
   end
 end

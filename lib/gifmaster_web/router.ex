@@ -24,7 +24,8 @@ defmodule GifmasterWeb.Router do
 
     live_session :public_routes, on_mount: [{GifmasterWeb.UserAuth, :mount_current_user}, {GifmasterWeb.Hooks, :global}] do
       live "/", HomeLive
-      live "/upload", HomeLive, :upload
+      live "/upload/new", HomeLive, :upload
+      live "/upload/:gif_id", HomeLive, :upload
     end
   end
 

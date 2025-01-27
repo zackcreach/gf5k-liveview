@@ -5,8 +5,8 @@ defmodule Gifmaster.Catalog do
   alias Gifmaster.Repo
 
   # gifs
-  def get_gif(id) do
-    CatalogRepo.get_gif(id)
+  def get_gif(gif_id) do
+    CatalogRepo.get_gif(gif_id)
   end
 
   def get_gifs(search) when search != "" do
@@ -35,10 +35,8 @@ defmodule Gifmaster.Catalog do
     |> Repo.update!()
   end
 
-  def delete_gif(id) do
-    id
-    |> CatalogRepo.delete_gif()
-    |> dbg()
+  def delete_gif(gif_id) do
+    CatalogRepo.delete_gif(gif_id)
   end
 
   # tags
