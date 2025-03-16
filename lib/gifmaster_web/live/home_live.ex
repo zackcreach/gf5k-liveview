@@ -4,9 +4,11 @@ defmodule GifmasterWeb.HomeLive do
   """
   use GifmasterWeb, :live_view
 
+  alias Ecto.Changeset
   alias Gifmaster.Catalog
   alias Gifmaster.Catalog.Gif
   alias Gifmaster.Repo
+  alias Phoenix.HTML.Form
   alias Phoenix.LiveView.AsyncResult
 
   @public_asset_domain "gems.gifmaster5000.com"
@@ -48,8 +50,7 @@ defmodule GifmasterWeb.HomeLive do
 
       <.form for={@gif_form} phx-submit="save_gif" phx-change="validate_gif">
         <div class="w-full aspect-square bg-grey grid place-items-center mb-4">
-          <p :if={length(@uploads.gif.entries) == 0}>Preview</p>
-          <.live_img_preview :for={entry <- @uploads.gif.entries} :if={@uploads.gif.entries} entry={entry} class="w-full" />
+          <.render_gif {assigns} />
         </div>
 
         <div class="h-20 border border-dashed border-gold grid place-items-center mb-4" phx-drop-target={@uploads.gif.ref}>
@@ -69,8 +70,12 @@ defmodule GifmasterWeb.HomeLive do
         </div>
 
         <div class="flex gap-x-4">
-          <.button type="submit">Upload</.button>
-          <.button :if={@gif_form[:id]} type="button" phx-click="delete_gif">Delete</.button>
+          <%= if is_binary(Form.input_value(@gif_form, :id)) do %>
+            <.button type="submit">Save</.button>
+          <% else %>
+            <.button type="submit">Upload</.button>
+          <% end %>
+          <.button :if={Form.input_value(@gif_form, :id)} type="button" phx-click="delete_gif">Delete</.button>
         </div>
       </.form>
     </.modal>
@@ -107,9 +112,9 @@ defmodule GifmasterWeb.HomeLive do
   defp maybe_parse_tags(""), do: ""
 
   defp maybe_parse_tags(form) do
-    dbg(form[:tags])
-    dbg(Phoenix.HTML.Form.input_value(form, :tags))
-    # String.split(tags, ",")
+    form
+    |> Form.input_value(:tags)
+    |> Enum.map_join(",", &Changeset.get_field(&1, :name))
   end
 
   defp get_gif_changeset(%{"gif_id" => gif_id}) do
@@ -124,7 +129,21 @@ defmodule GifmasterWeb.HomeLive do
 
   defp get_gif_changeset(_params), do: Gif.changeset(%Gif{})
 
-  def handle_event("validate_gif", %{"gif" => %{"name" => name} = params}, socket) do
+  defp render_gif(%{gif_form: %{data: %{file: %{url: %{absolute: absolute}}}}} = assigns) do
+    ~H"""
+    <img class="h-full object-cover" src={absolute} />
+    """
+  end
+
+  defp render_gif(%{uploads: %{gif: %{entries: []}}} = assigns), do: ~H"<p>Preview</p>"
+
+  defp render_gif(%{uploads: %{gif: %{entries: entries}}} = assigns) do
+    ~H"""
+    <.live_img_preview :for={entry <- entries} entry={entry} class="w-full" />
+    """
+  end
+
+  def handle_event("validate_gif", %{"name" => name} = params, socket) do
     params =
       if length(socket.assigns.uploads.gif.entries) > 0 and name == "" do
         [%Phoenix.LiveView.UploadEntry{client_name: name}] = socket.assigns.uploads.gif.entries
@@ -142,7 +161,7 @@ defmodule GifmasterWeb.HomeLive do
     {:noreply, assign(socket, gif_form: gif_form)}
   end
 
-  def handle_event("save_gif", %{"gif" => %{"name" => name, "tags" => tags}}, socket) do
+  def handle_event("save_gif", %{"name" => name, "tags" => tags}, socket) do
     filename =
       consume_uploaded_entries(socket, :gif, fn %{key: key}, _entry -> key end)
 
