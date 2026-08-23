@@ -21,20 +21,30 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
-      raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
-      """
+  database_options =
+    case {System.get_env("DATABASE_URL"), System.get_env("DATABASE_SOCKET_DIR")} do
+      {database_url, _socket_dir} when database_url not in [nil, ""] ->
+        maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+        [url: database_url, socket_options: maybe_ipv6]
 
-  maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+      {_database_url, socket_dir} when socket_dir not in [nil, ""] ->
+        username =
+          System.get_env("DATABASE_USERNAME") ||
+            raise "environment variable DATABASE_USERNAME is required with DATABASE_SOCKET_DIR."
 
-  config :gifmaster, Gifmaster.Repo,
-    # ssl: true,
-    url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    socket_options: maybe_ipv6
+        database =
+          System.get_env("DATABASE_NAME") ||
+            raise "environment variable DATABASE_NAME is required with DATABASE_SOCKET_DIR."
+
+        [socket_dir: socket_dir, username: username, database: database]
+
+      _external_database ->
+        raise "DATABASE_URL or DATABASE_SOCKET_DIR is required."
+    end
+
+  config :gifmaster,
+         Gifmaster.Repo,
+         [pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")] ++ database_options
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
