@@ -9,25 +9,24 @@ defmodule Gifmaster.Assets.Importer do
   alias Gifmaster.Catalog.Gif
   alias Gifmaster.Repo
 
-  def import(inventory, archive_directory) when is_list(inventory) do
+  def import(inventory, archive_directory, mapping \\ %{}) when is_list(inventory) and is_map(mapping) do
     inventory
-    |> Enum.map(&import_object(&1, archive_directory))
+    |> Enum.map(&import_object(&1, archive_directory, mapping))
     |> summarize()
   end
 
-  defp import_object(%{"key" => key} = object, archive_directory) do
+  defp import_object(%{"key" => key} = object, archive_directory, mapping) do
     path = Path.join(archive_directory, key)
 
     with {:ok, source_bytes} <- File.read(path),
-         :ok <- verify_source(source_bytes, object),
-         {:ok, gif} <- matching_gif(key) do
-      reconcile_object(source_bytes, key, object, gif)
+         :ok <- verify_source(source_bytes, object) do
+      reconcile_object(source_bytes, key, object, mapping)
     else
       {:error, reason} -> {:failed, key, reason}
     end
   end
 
-  defp import_object(object, _archive_directory), do: {:failed, inspect(object), :invalid_inventory_entry}
+  defp import_object(object, _archive_directory, _mapping), do: {:failed, inspect(object), :invalid_inventory_entry}
 
   defp verify_source(bytes, %{"sha256" => expected_hash}) do
     actual_hash = :sha256 |> :crypto.hash(bytes) |> Base.encode16(case: :lower)
@@ -55,13 +54,22 @@ defmodule Gifmaster.Assets.Importer do
     end
   end
 
-  defp reconcile_object(source_bytes, key, object, gif) do
-    if reconciled?(source_bytes, key, object, gif) do
-      {:skipped, key}
-    else
-      upload_object(source_bytes, key, gif)
+  defp reconcile_object(source_bytes, key, object, mapping) do
+    case Map.get(mapping, "/#{key}") do
+      "/__archive/" <> ^key ->
+        {:fallback, key, :configured}
+
+      _cloudinary_route ->
+        with {:ok, gif} <- matching_gif(key) do
+          source_bytes
+          |> reconciled?(key, object, gif)
+          |> reconcile_cloudinary(source_bytes, key, gif)
+        end
     end
   end
+
+  defp reconcile_cloudinary(true, _source_bytes, key, _gif), do: {:skipped, key}
+  defp reconcile_cloudinary(false, source_bytes, key, gif), do: upload_object(source_bytes, key, gif)
 
   defp reconciled?(source_bytes, key, _object, nil) do
     :ok == Cloudinary.verify_delivery(source_bytes, key)
@@ -77,7 +85,7 @@ defmodule Gifmaster.Assets.Importer do
          {:ok, persisted_asset} <- persist_asset(gif, key, metadata) do
       {:imported, key, persisted_asset}
     else
-      {:error, reason} -> {:failed, key, reason}
+      {:error, reason} -> {:fallback, key, reason}
     end
   end
 
@@ -145,11 +153,16 @@ defmodule Gifmaster.Assets.Importer do
 
   defp summarize(results) do
     failures = Enum.filter(results, &match?({:failed, _key, _reason}, &1))
+    fallbacks = Enum.filter(results, &match?({:fallback, _key, _reason}, &1))
 
     summary = %{
       imported: Enum.count(results, &match?({:imported, _key, _file}, &1)),
       skipped: Enum.count(results, &match?({:skipped, _key}, &1)),
-      failed: failures
+      fallback: Enum.map(fallbacks, fn {:fallback, key, _reason} -> key end),
+      failed:
+        Enum.map(failures, fn {:failed, key, reason} ->
+          %{key: key, reason: inspect(reason, limit: :infinity)}
+        end)
     }
 
     case failures do
