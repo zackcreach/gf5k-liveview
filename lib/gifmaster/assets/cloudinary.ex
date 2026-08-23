@@ -32,6 +32,15 @@ defmodule Gifmaster.Assets.Cloudinary do
     end
   end
 
+  def verify_delivery(bytes, key) when is_binary(bytes) and is_binary(key) do
+    with {:ok, config} <- config() do
+      config
+      |> delivery_url(key)
+      |> Req.get([decode_body: false, max_retries: 2] ++ config.request_options)
+      |> verify_response(bytes)
+    end
+  end
+
   defp config do
     config = Application.get_env(:gifmaster, __MODULE__, [])
 
@@ -68,6 +77,31 @@ defmodule Gifmaster.Assets.Cloudinary do
     do: Keyword.put(fields, :folder, folder)
 
   defp maybe_add_folder(fields, _folder), do: fields
+
+  defp delivery_url(config, key) do
+    asset_path =
+      [config.folder, key]
+      |> Enum.reject(&(&1 in [nil, ""]))
+      |> Path.join()
+      |> String.split("/")
+      |> Enum.map_join("/", &encode_path_segment/1)
+
+    "https://res.cloudinary.com/#{config.cloud_name}/image/upload/#{asset_path}"
+  end
+
+  defp verify_response({:ok, %Req.Response{status: 200, body: delivered_bytes}}, source_bytes) do
+    case {:crypto.hash(:sha256, source_bytes), :crypto.hash(:sha256, delivered_bytes)} do
+      {hash, hash} -> :ok
+      {_source_hash, _delivered_hash} -> {:error, :delivered_hash_mismatch}
+    end
+  end
+
+  defp verify_response({:ok, %Req.Response{status: status}}, _source_bytes),
+    do: {:error, {:delivery_http_error, status}}
+
+  defp verify_response({:error, reason}, _source_bytes), do: {:error, {:delivery_failed, reason}}
+
+  defp encode_path_segment(segment), do: URI.encode(segment, &URI.char_unreserved?/1)
 
   defp normalize_response({:ok, %Req.Response{status: status, body: body}}) when status in 200..299 do
     body = decode_body(body)

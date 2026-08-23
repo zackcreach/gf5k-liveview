@@ -73,6 +73,22 @@ defmodule Gifmaster.Assets.CloudinaryTest do
              Cloudinary.upload("image-bytes", filename: "example.gif", public_id: "example")
   end
 
+  test "verifies deterministic delivery bytes" do
+    Req.Test.stub(__MODULE__, fn conn ->
+      assert "/demo/image/upload/gifmaster/test/example.gif" == conn.request_path
+      Plug.Conn.send_resp(conn, 200, "image-bytes")
+    end)
+
+    assert :ok == Cloudinary.verify_delivery("image-bytes", "example.gif")
+  end
+
+  test "rejects a deterministic delivery with different bytes" do
+    Req.Test.stub(__MODULE__, fn conn -> Plug.Conn.send_resp(conn, 200, "different-bytes") end)
+
+    assert {:error, :delivered_hash_mismatch} ==
+             Cloudinary.verify_delivery("image-bytes", "example.gif")
+  end
+
   defp restore_config(nil), do: Application.delete_env(:gifmaster, Cloudinary)
   defp restore_config(config), do: Application.put_env(:gifmaster, Cloudinary, config)
 end

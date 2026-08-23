@@ -20,14 +20,9 @@ defmodule Gifmaster.Assets.Importer do
 
     with {:ok, source_bytes} <- File.read(path),
          :ok <- verify_source(source_bytes, object),
-         {:ok, gif} <- matching_gif(key),
-         false <- verified?(gif, object),
-         {:ok, metadata} <- upload(source_bytes, key),
-         :ok <- verify_delivery(source_bytes, metadata),
-         {:ok, updated_gif} <- update_gif(gif, key, metadata) do
-      {:imported, key, updated_gif.file}
+         {:ok, gif} <- matching_gif(key) do
+      reconcile_object(source_bytes, key, object, gif)
     else
-      true -> {:skipped, key}
       {:error, reason} -> {:failed, key, reason}
     end
   end
@@ -56,7 +51,33 @@ defmodule Gifmaster.Assets.Importer do
     |> Repo.one()
     |> case do
       %Gif{} = gif -> {:ok, gif}
-      nil -> {:error, :database_record_not_found}
+      nil -> {:ok, nil}
+    end
+  end
+
+  defp reconcile_object(source_bytes, key, object, gif) do
+    if reconciled?(source_bytes, key, object, gif) do
+      {:skipped, key}
+    else
+      upload_object(source_bytes, key, gif)
+    end
+  end
+
+  defp reconciled?(source_bytes, key, _object, nil) do
+    :ok == Cloudinary.verify_delivery(source_bytes, key)
+  end
+
+  defp reconciled?(source_bytes, key, object, %Gif{} = gif) do
+    verified?(gif, object) and :ok == Cloudinary.verify_delivery(source_bytes, key)
+  end
+
+  defp upload_object(source_bytes, key, gif) do
+    with {:ok, metadata} <- upload(source_bytes, key),
+         :ok <- verify_delivery(source_bytes, metadata),
+         {:ok, persisted_asset} <- persist_asset(gif, key, metadata) do
+      {:imported, key, persisted_asset}
+    else
+      {:error, reason} -> {:failed, key, reason}
     end
   end
 
@@ -111,6 +132,15 @@ defmodule Gifmaster.Assets.Importer do
     |> Ecto.Changeset.change()
     |> Ecto.Changeset.put_embed(:file, file)
     |> Repo.update()
+  end
+
+  defp persist_asset(nil, _key, metadata), do: {:ok, metadata}
+
+  defp persist_asset(%Gif{} = gif, key, metadata) do
+    case update_gif(gif, key, metadata) do
+      {:ok, updated_gif} -> {:ok, updated_gif.file}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   defp summarize(results) do
