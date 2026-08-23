@@ -47,6 +47,7 @@ config :esbuild,
 
 # Configure tailwind (the version is required)
 config :tailwind,
+  path: System.get_env("MIX_TAILWIND_PATH"),
   version: "3.4.3",
   gifmaster: [
     args: ~w(
