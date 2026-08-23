@@ -1,9 +1,10 @@
 defmodule GifmasterWeb.UserSettingsLiveTest do
   use GifmasterWeb.ConnCase, async: true
 
-  alias Gifmaster.Account
-  import Phoenix.LiveViewTest
   import Gifmaster.AccountFixtures
+  import Phoenix.LiveViewTest
+
+  alias Gifmaster.Account
 
   describe "Settings page" do
     test "renders settings page", %{conn: conn} do

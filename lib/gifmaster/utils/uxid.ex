@@ -62,7 +62,7 @@ defmodule Gifmaster.Utils.UXID do
   Converts the options specified in the field macro into parameters to be used in other callbacks.
   """
   def init(opts) do
-    Enum.into(opts, %{})
+    Map.new(opts)
   end
 
   @impl Ecto.ParameterizedType

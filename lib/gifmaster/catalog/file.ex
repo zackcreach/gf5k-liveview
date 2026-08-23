@@ -1,9 +1,11 @@
 defmodule Gifmaster.Catalog.File do
+  @moduledoc false
   use Gifmaster.Schema
 
   import Ecto.Changeset
 
   defmodule Url do
+    @moduledoc false
     use Gifmaster.Schema
 
     @primary_key false
@@ -16,13 +18,30 @@ defmodule Gifmaster.Catalog.File do
   @primary_key false
   embedded_schema do
     field :bucket, :string
+    field :provider, Ecto.Enum, values: [:s3, :cloudinary]
+    field :cloudinary_public_id, :string
+    field :cloudinary_asset_id, :string
+    field :cloudinary_version, :string
+    field :format, :string
+    field :width, :integer
+    field :height, :integer
+    field :byte_count, :integer
     embeds_one :url, Url
   end
 
   def changeset(file, params \\ %{}) do
     file
-    |> change(bucket: Application.get_env(:gifmaster, :aws_bucket))
-    |> cast(params, [:bucket])
+    |> cast(params, [
+      :bucket,
+      :provider,
+      :cloudinary_public_id,
+      :cloudinary_asset_id,
+      :cloudinary_version,
+      :format,
+      :width,
+      :height,
+      :byte_count
+    ])
     |> cast_embed(:url, required: true, with: &url_changeset/2)
   end
 

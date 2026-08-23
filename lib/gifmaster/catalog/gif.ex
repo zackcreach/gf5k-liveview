@@ -1,12 +1,13 @@
 defmodule Gifmaster.Catalog.Gif do
+  @moduledoc false
   use Gifmaster.Schema
 
   import Ecto.Changeset
   import Ecto.Query
 
-  alias Gifmaster.Repo
   alias Gifmaster.Catalog.File
   alias Gifmaster.Catalog.Tag
+  alias Gifmaster.Repo
 
   schema "gifs" do
     field :name, :string

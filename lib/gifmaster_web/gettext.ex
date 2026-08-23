@@ -20,5 +20,5 @@ defmodule GifmasterWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :gifmaster
+  use Gettext.Backend, otp_app: :gifmaster
 end

@@ -1,8 +1,8 @@
 defmodule GifmasterWeb.UserLoginLiveTest do
   use GifmasterWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
   import Gifmaster.AccountFixtures
+  import Phoenix.LiveViewTest
 
   describe "Log in page" do
     test "renders log in page", %{conn: conn} do

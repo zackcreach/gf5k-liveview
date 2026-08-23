@@ -1,8 +1,9 @@
 defmodule GifmasterWeb.UserAuth do
+  @moduledoc false
   use GifmasterWeb, :verified_routes
 
-  import Plug.Conn
   import Phoenix.Controller
+  import Plug.Conn
 
   alias Gifmaster.Account
 

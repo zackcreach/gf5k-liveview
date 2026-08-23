@@ -5,13 +5,13 @@ defmodule GifmasterWeb.HomeLive do
   use GifmasterWeb, :live_view
 
   alias Ecto.Changeset
+  alias Gifmaster.Assets.Cloudinary
   alias Gifmaster.Catalog
   alias Gifmaster.Catalog.Gif
-  alias Gifmaster.Repo
   alias Phoenix.HTML.Form
   alias Phoenix.LiveView.AsyncResult
 
-  @public_asset_domain "gems.gifmaster5000.com"
+  @max_upload_size 8_000_000
 
   def mount(params, _session, socket) do
     socket
@@ -23,7 +23,7 @@ defmodule GifmasterWeb.HomeLive do
       gifs: AsyncResult.loading()
     )
     |> assign_async(:gifs, fn -> {:ok, %{gifs: Catalog.get_gifs()}} end)
-    |> allow_upload(:gif, accept: [".gif"], max_entries: 1, external: &presign_upload/2)
+    |> allow_upload(:gif, accept: [".gif"], max_entries: 1, max_file_size: @max_upload_size)
     |> ok()
   end
 
@@ -82,29 +82,6 @@ defmodule GifmasterWeb.HomeLive do
     """
   end
 
-  defp presign_upload(entry, socket) do
-    key = Regex.replace(~r/.+(?=\.\w+)/, entry.client_name, &Recase.to_snake/1)
-    uploads = socket.assigns.uploads
-    bucket = @public_asset_domain
-
-    config = %{
-      region: "us-east-1",
-      access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID"),
-      secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY")
-    }
-
-    {:ok, fields} =
-      SimpleS3Upload.sign_form_upload(config, bucket,
-        key: key,
-        content_type: entry.client_type,
-        max_file_size: uploads[entry.upload_config].max_file_size,
-        expires_in: :timer.hours(1)
-      )
-
-    meta = %{uploader: "S3", key: key, url: "http://#{bucket}.s3.amazonaws.com", fields: fields}
-    {:ok, meta, socket}
-  end
-
   defp error_to_string(:too_large), do: "Too large"
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
@@ -130,16 +107,20 @@ defmodule GifmasterWeb.HomeLive do
   defp get_gif_changeset(_params), do: Gif.changeset(%Gif{})
 
   defp render_gif(%{gif_form: %{data: %{file: %{url: %{absolute: absolute}}}}} = assigns) do
+    assigns = assign(assigns, :absolute, absolute)
+
     ~H"""
-    <img class="h-full object-cover" src={absolute} />
+    <img class="h-full object-cover" src={@absolute} />
     """
   end
 
   defp render_gif(%{uploads: %{gif: %{entries: []}}} = assigns), do: ~H"<p>Preview</p>"
 
   defp render_gif(%{uploads: %{gif: %{entries: entries}}} = assigns) do
+    assigns = assign(assigns, :entries, entries)
+
     ~H"""
-    <.live_img_preview :for={entry <- entries} entry={entry} class="w-full" />
+    <.live_img_preview :for={entry <- @entries} entry={entry} class="w-full" />
     """
   end
 
@@ -147,7 +128,6 @@ defmodule GifmasterWeb.HomeLive do
     params =
       if length(socket.assigns.uploads.gif.entries) > 0 and name == "" do
         [%Phoenix.LiveView.UploadEntry{client_name: name}] = socket.assigns.uploads.gif.entries
-        # remove file extension for name suggestion
         Map.put(params, "name", Regex.replace(~r/\.\w+$/, name, ""))
       else
         params
@@ -162,24 +142,15 @@ defmodule GifmasterWeb.HomeLive do
   end
 
   def handle_event("save_gif", %{"name" => name, "tags" => tags}, socket) do
-    filename =
-      consume_uploaded_entries(socket, :gif, fn %{key: key}, _entry -> key end)
-
     socket =
-      case Repo.transaction(fn ->
-             Catalog.create_gif(%{
-               name: name,
-               tags: String.split(tags, ", "),
-               file: %{url: %{relative: "/#{filename}", absolute: "https://#{@public_asset_domain}/#{filename}"}}
-             })
-           end) do
+      case upload_and_create_gif(socket, name, tags) do
         {:ok, %Gif{}} ->
           socket
           |> put_flash(:info, "Gif saved successfully.")
           |> redirect(to: ~p"/")
 
         {:error, error} ->
-          put_flash(socket, :error, "Error saving gif: #{error}")
+          put_flash(socket, :error, "Error saving gif: #{inspect(error)}")
       end
 
     {:noreply, socket}
@@ -219,5 +190,53 @@ defmodule GifmasterWeb.HomeLive do
     socket
     |> redirect(to: ~p"/upload/new")
     |> noreply()
+  end
+
+  defp upload_and_create_gif(socket, name, tags) do
+    case consume_uploaded_entries(socket, :gif, &upload_entry/2) do
+      [{:ok, file}] ->
+        Catalog.create_gif(%{
+          name: name,
+          tags: String.split(tags, ","),
+          file: file
+        })
+
+      [{:error, reason}] ->
+        {:error, reason}
+
+      [] ->
+        {:error, :gif_required}
+    end
+  end
+
+  defp upload_entry(%{path: path}, entry) do
+    key = normalized_key(entry.client_name)
+    public_id = Path.rootname(key)
+
+    with {:ok, bytes} <- File.read(path),
+         {:ok, metadata} <-
+           Cloudinary.upload(bytes,
+             filename: key,
+             content_type: entry.client_type,
+             public_id: public_id
+           ) do
+      {:ok, {:ok, Map.merge(metadata, public_urls(key))}}
+    else
+      {:error, reason} -> {:ok, {:error, reason}}
+    end
+  end
+
+  defp normalized_key(filename) do
+    extension = filename |> Path.extname() |> String.downcase()
+
+    filename
+    |> Path.rootname()
+    |> Recase.to_snake()
+    |> Kernel.<>(extension)
+  end
+
+  defp public_urls(key) do
+    domain = Application.fetch_env!(:gifmaster, :public_asset_domain)
+    %{url: %{relative: "/#{key}", absolute: "https://#{domain}/#{key}"}}
   end
 end

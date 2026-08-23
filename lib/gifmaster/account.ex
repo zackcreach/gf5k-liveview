@@ -4,9 +4,11 @@ defmodule Gifmaster.Account do
   """
 
   import Ecto.Query, warn: false
-  alias Gifmaster.Repo
 
-  alias Gifmaster.Account.{User, UserToken, UserNotifier}
+  alias Gifmaster.Account.User
+  alias Gifmaster.Account.UserNotifier
+  alias Gifmaster.Account.UserToken
+  alias Gifmaster.Repo
 
   ## Database getters
 
@@ -38,8 +40,7 @@ defmodule Gifmaster.Account do
       nil
 
   """
-  def get_user_by_email_and_password(email, password)
-      when is_binary(email) and is_binary(password) do
+  def get_user_by_email_and_password(email, password) when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, email: email)
     if User.valid_password?(user, password), do: user
   end

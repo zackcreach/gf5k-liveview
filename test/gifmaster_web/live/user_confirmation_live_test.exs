@@ -1,8 +1,8 @@
 defmodule GifmasterWeb.UserConfirmationLiveTest do
   use GifmasterWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
   import Gifmaster.AccountFixtures
+  import Phoenix.LiveViewTest
 
   alias Gifmaster.Account
   alias Gifmaster.Repo
@@ -56,8 +56,7 @@ defmodule GifmasterWeb.UserConfirmationLiveTest do
 
       # when logged in
       conn =
-        build_conn()
-        |> log_in_user(user)
+        log_in_user(build_conn(), user)
 
       {:ok, lv, _html} = live(conn, ~p"/users/confirm/#{token}")
 

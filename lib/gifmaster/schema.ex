@@ -1,4 +1,5 @@
 defmodule Gifmaster.Schema do
+  @moduledoc false
   alias Gifmaster.Utils.UXID
 
   defmacro __using__(_macro_args) do

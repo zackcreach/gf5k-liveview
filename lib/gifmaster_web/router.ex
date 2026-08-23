@@ -22,10 +22,11 @@ defmodule GifmasterWeb.Router do
   scope "/", GifmasterWeb do
     pipe_through :browser
 
-    live_session :public_routes, on_mount: [{GifmasterWeb.UserAuth, :mount_current_user}, {GifmasterWeb.Hooks, :global}] do
+    get "/health", HealthController, :show
+
+    live_session :public_routes,
+      on_mount: [{GifmasterWeb.UserAuth, :mount_current_user}, {GifmasterWeb.Hooks, :global}] do
       live "/", HomeLive
-      live "/upload/new", HomeLive, :upload
-      live "/upload/:gif_id", HomeLive, :upload
     end
   end
 
@@ -72,6 +73,8 @@ defmodule GifmasterWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{GifmasterWeb.UserAuth, :ensure_authenticated}, {GifmasterWeb.Hooks, :global}] do
+      live "/upload/new", HomeLive, :upload
+      live "/upload/:gif_id", HomeLive, :upload
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end

@@ -1,4 +1,5 @@
 defmodule Gifmaster.Account.UserNotifier do
+  @moduledoc false
   import Swoosh.Email
 
   alias Gifmaster.Mailer

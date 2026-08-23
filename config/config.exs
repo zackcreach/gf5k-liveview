@@ -24,11 +24,7 @@ config :gifmaster, GifmasterWeb.Endpoint,
 
 config :gifmaster, Gifmaster.Repo, migration_primary_key: false
 
-config :gifmaster,
-  aws_access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
-  aws_secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
-  aws_bucket: "gems.gifmaster5000.com",
-  aws_region: "us-east-1"
+config :gifmaster, :public_asset_domain, "gems.gifmaster5000.com"
 
 # Configures the mailer
 #

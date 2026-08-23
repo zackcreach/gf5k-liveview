@@ -3,41 +3,21 @@
     <img src="https://gems.gifmaster5000.com/logo.png" alt="Gifmaster Logo" class="w-[400px]" />
   </a>
 
-  <.button :if={assigns[:current_user]} class="mb-3" phx-click={send(self(), :open_modal)}>Upload</.button>
-
-  <!-- <ul class="absolute top-0 right-0 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end text-white"> -->
-  <!--   <%= if assigns[:current_user] do %> -->
-  <!--     <li class="text-[0.8125rem] leading-6"> -->
-  <!--       <%= @current_user.email %> -->
-  <!--     </li> -->
-  <!--     <li> -->
-  <!--       <.link href={~p"/users/settings"} class="text-[0.8125rem] leading-6 font-semibold"> -->
-  <!--         Settings -->
-  <!--       </.link> -->
-  <!--     </li> -->
-  <!--     <li> -->
-  <!--       <.link href={~p"/users/log_out"} method="delete" class="text-[0.8125rem] leading-6 font-semibold"> -->
-  <!--         Log out -->
-  <!--       </.link> -->
-  <!--     </li> -->
-  <!--   <% else %> -->
-  <!--     <li> -->
-  <!--       <.link href={~p"/users/register"} class="text-[0.8125rem] leading-6 font-semibold"> -->
-  <!--         Register -->
-  <!--       </.link> -->
-  <!--     </li> -->
-  <!--     <li> -->
-  <!--       <.link href={~p"/users/log_in"} class="text-[0.8125rem] leading-6 font-semibold"> -->
-  <!--         Log in -->
-  <!--       </.link> -->
-  <!--     </li> -->
-  <!--   <% end %> -->
-  <!-- </ul> -->
+  <div :if={assigns[:current_user]} class="flex items-center gap-4 text-white">
+    <span>{@current_user.email}</span>
+    <.link href={~p"/users/settings"}>Settings</.link>
+    <.link href={~p"/users/log_out"} method="delete">Log out</.link>
+    <.button phx-click={send(self(), :open_modal)}>Upload</.button>
+  </div>
+  <div :if={!assigns[:current_user]} class="flex items-center gap-4 text-white">
+    <.link href={~p"/users/register"}>Register</.link>
+    <.link href={~p"/users/log_in"}>Log in</.link>
+  </div>
 </header>
 
 <main class="bg-grey-400 min-h-screen">
   <div class="px-12 py-6">
     <.flash_group flash={@flash} />
-    <%= @inner_content %>
+    {@inner_content}
   </div>
 </main>

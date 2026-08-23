@@ -1,4 +1,5 @@
 defmodule Gifmaster.Utils.Migrations do
+  @moduledoc false
   use Publicist
 
   defp gen_fragment(prefix) do
@@ -13,9 +14,7 @@ defmodule Gifmaster.Utils.Migrations do
     quote do
       add(:id, :text,
         primary_key: true,
-        default:
-          unquote(gen_fragment(prefix))
-          |> fragment
+        default: fragment(unquote(gen_fragment(prefix)))
       )
     end
   end
@@ -23,6 +22,7 @@ defmodule Gifmaster.Utils.Migrations do
   defmacro __using__(_opts) do
     quote do
       use Ecto.Migration
+
       import Gifmaster.Utils.Migrations
     end
   end

@@ -20,14 +20,14 @@ defmodule GifmasterWeb.ConnCase do
   using do
     quote do
       # The default endpoint for testing
-      @endpoint GifmasterWeb.Endpoint
-
       use GifmasterWeb, :verified_routes
 
       # Import conveniences for testing with connections
-      import Plug.Conn
-      import Phoenix.ConnTest
       import GifmasterWeb.ConnCase
+      import Phoenix.ConnTest
+      import Plug.Conn
+
+      @endpoint GifmasterWeb.Endpoint
     end
   end
 

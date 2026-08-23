@@ -15,8 +15,7 @@ defmodule GifmasterWeb.CoreComponents do
   Icons are provided by [heroicons](https://heroicons.com). See `icon/1` for usage.
   """
   use Phoenix.Component
-
-  import GifmasterWeb.Gettext
+  use Gettext, backend: GifmasterWeb.Gettext
 
   alias Phoenix.LiveView.JS
 

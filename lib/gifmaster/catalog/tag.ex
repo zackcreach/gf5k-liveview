@@ -1,4 +1,5 @@
 defmodule Gifmaster.Catalog.Tag do
+  @moduledoc false
   use Gifmaster.Schema
 
   import Ecto.Changeset

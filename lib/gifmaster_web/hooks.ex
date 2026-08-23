@@ -1,4 +1,5 @@
 defmodule GifmasterWeb.Hooks do
+  @moduledoc false
   import Phoenix.Component, only: [assign: 3]
   import Phoenix.LiveView, only: [attach_hook: 4]
 

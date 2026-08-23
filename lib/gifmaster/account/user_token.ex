@@ -1,4 +1,5 @@
 defmodule Gifmaster.Account.UserToken do
+  @moduledoc false
   use Ecto.Schema
   use Gifmaster.Schema
 

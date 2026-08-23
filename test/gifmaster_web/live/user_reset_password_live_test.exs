@@ -1,8 +1,8 @@
 defmodule GifmasterWeb.UserResetPasswordLiveTest do
   use GifmasterWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
   import Gifmaster.AccountFixtures
+  import Phoenix.LiveViewTest
 
   alias Gifmaster.Account
 

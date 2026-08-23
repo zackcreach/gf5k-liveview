@@ -24,7 +24,7 @@ defmodule Gifmaster.Catalog do
   def create_gif(gif) do
     %Gif{}
     |> Gif.changeset(gif)
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   def edit_gif(gif) do

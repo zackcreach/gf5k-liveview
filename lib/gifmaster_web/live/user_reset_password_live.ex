@@ -1,4 +1,5 @@
 defmodule GifmasterWeb.UserResetPasswordLive do
+  @moduledoc false
   use GifmasterWeb, :live_view
 
   alias Gifmaster.Account

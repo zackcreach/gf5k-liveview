@@ -48,6 +48,7 @@ defmodule GifmasterWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+  plug GifmasterWeb.Plugs, :redirect_legacy_hosts
   plug Plug.Session, @session_options
   plug GifmasterWeb.Router
 end

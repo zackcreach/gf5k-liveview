@@ -1,8 +1,8 @@
 defmodule GifmasterWeb.UserRegistrationLiveTest do
   use GifmasterWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
   import Gifmaster.AccountFixtures
+  import Phoenix.LiveViewTest
 
   describe "Registration page" do
     test "renders registration page", %{conn: conn} do

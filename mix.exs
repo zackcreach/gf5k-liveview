@@ -41,7 +41,8 @@ defmodule Gifmaster.MixProject do
       {:finch, "~> 0.13"},
       {:floki, ">= 0.30.0", only: :test},
       {:gettext, "~> 0.20"},
-      {:heroicons, github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
+      {:heroicons,
+       github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
       {:jason, "~> 1.2"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
@@ -52,12 +53,12 @@ defmodule Gifmaster.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:publicist, "1.1.0"},
       {:recase, "~> 0.5"},
+      {:req, "~> 0.5"},
       {:styler, "~> 0.8", only: [:dev, :test], runtime: false},
       {:swoosh, "~> 1.5"},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:tesla, "~> 1.12.1"},
       {:tiny_maps, "~> 3.0"}
     ]
   end

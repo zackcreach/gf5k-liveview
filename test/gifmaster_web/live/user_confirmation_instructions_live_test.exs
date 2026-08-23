@@ -1,8 +1,8 @@
 defmodule GifmasterWeb.UserConfirmationInstructionsLiveTest do
   use GifmasterWeb.ConnCase, async: true
 
-  import Phoenix.LiveViewTest
   import Gifmaster.AccountFixtures
+  import Phoenix.LiveViewTest
 
   alias Gifmaster.Account
   alias Gifmaster.Repo

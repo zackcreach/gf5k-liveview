@@ -8,17 +8,17 @@
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"} />
 
-    <.live_title><%= assigns[:title] || "Gifmaster 5000" %></.live_title>
+    <.live_title>{assigns[:title] || "Gifmaster 5000"}</.live_title>
 
     <meta name="title" content={assigns[:title] || "Gifmaster 5000"} />
-    <meta name="description" content={@description} />
-    <meta name="robots" content="noindex,nofollow" />
-    <meta name="og:title" content={@title} />
+    <meta name="description" content={assigns[:description] || "The best gifs you ever did see"} />
+    <meta name="robots" content="index,follow" />
+    <meta name="og:title" content={assigns[:title] || "Gifmaster 5000"} />
     <meta name="og:type" content="website" />
     <meta name="og:url" content={@current_url} />
     <meta name="og:image" content="https://gems.gifmaster5000.com/favicon.png" />
-    <meta name="og:site_name" content={@title} />
-    <meta name="og:description" content={@description} />
+    <meta name="og:site_name" content={assigns[:title] || "Gifmaster 5000"} />
+    <meta name="og:description" content={assigns[:description] || "The best gifs you ever did see"} />
 
     <link rel="apple-touch-icon" href="https://gems.gifmaster5000.com/favicon.png" />
     <link sizes="72x72" rel="apple-touch-icon" href="https://gems.gifmaster5000.com/favicon.png" />
@@ -28,6 +28,6 @@
   </head>
 
   <body>
-    <%= @inner_content %>
+    {@inner_content}
   </body>
 </html>

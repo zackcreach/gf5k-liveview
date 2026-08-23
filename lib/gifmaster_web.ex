@@ -42,7 +42,8 @@ defmodule GifmasterWeb do
         formats: [:html, :json],
         layouts: [html: GifmasterWeb.Layouts]
 
-      import GifmasterWeb.Gettext
+      use Gettext, backend: GifmasterWeb.Gettext
+
       import Plug.Conn
 
       unquote(verified_routes())
@@ -86,8 +87,9 @@ defmodule GifmasterWeb do
     quote do
       # HTML escaping functionality
       # Core UI components and translation
+      use Gettext, backend: GifmasterWeb.Gettext
+
       import GifmasterWeb.CoreComponents
-      import GifmasterWeb.Gettext
       import Phoenix.HTML
 
       # Shortcut for generating JS commands
