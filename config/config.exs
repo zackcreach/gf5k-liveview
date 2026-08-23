@@ -37,6 +37,7 @@ config :gifmaster, Gifmaster.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configure esbuild (the version is required)
 config :esbuild,
+  path: System.get_env("MIX_ESBUILD_PATH"),
   version: "0.17.11",
   gifmaster: [
     args:
