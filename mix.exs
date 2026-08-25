@@ -23,6 +23,10 @@ defmodule Gifmaster.MixProject do
     ]
   end
 
+  def cli do
+    [preferred_envs: [precommit: :test]]
+  end
+
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
@@ -75,13 +79,24 @@ defmodule Gifmaster.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.setup": asset_setup_tasks(),
       "assets.build": ["tailwind gifmaster", "esbuild gifmaster"],
       "assets.deploy": [
         "tailwind gifmaster --minify",
         "esbuild gifmaster --minify",
         "phx.digest"
-      ]
+      ],
+      precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]
+  end
+
+  defp asset_setup_tasks do
+    case {System.get_env("MIX_TAILWIND_PATH"), System.get_env("MIX_ESBUILD_PATH")} do
+      {tailwind_path, esbuild_path} when tailwind_path != nil and esbuild_path != nil ->
+        []
+
+      _mix_managed_assets ->
+        ["tailwind.install --if-missing", "esbuild.install --if-missing"]
+    end
   end
 end
