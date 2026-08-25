@@ -102,6 +102,7 @@
           packages = [
             beamPackages.elixir
             pkgs.esbuild
+            pkgs.inotify-tools
             pkgs.mix2nix
             pkgs.nodejs_22
             pkgs.postgresql_18
