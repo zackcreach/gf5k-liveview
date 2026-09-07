@@ -283,12 +283,12 @@ let
 
     mint = buildMix rec {
       name = "mint";
-      version = "1.9.3";
+      version = "1.10.0";
 
       src = fetchHex {
         pkg = "mint";
         version = "${version}";
-        sha256 = "5f7c9342480c069dbbc4eeac3490303c9e01870ff01a7f1d29b6107054fc1e74";
+        sha256 = "8b16fb72aaa7531d206a1f05e4cc85509ba531ccec7a17a22736c9c95cbb24d1";
       };
 
       beamDeps = [ castore hpax ];
@@ -400,12 +400,12 @@ let
 
     phoenix_pubsub = buildMix rec {
       name = "phoenix_pubsub";
-      version = "2.2.0";
+      version = "2.3.0";
 
       src = fetchHex {
         pkg = "phoenix_pubsub";
         version = "${version}";
-        sha256 = "adc313a5bf7136039f63cfd9668fde73bba0765e0614cba80c06ac9460ff3e96";
+        sha256 = "eec7be6e9cf02e2551d389b558402d6c637cd3973796326e7ba4bb03c6b2e91d";
       };
 
       beamDeps = [];
@@ -491,12 +491,12 @@ let
 
     req = buildMix rec {
       name = "req";
-      version = "0.7.3";
+      version = "0.7.4";
 
       src = fetchHex {
         pkg = "req";
         version = "${version}";
-        sha256 = "73b303030dccc2b6d023ee5ada380825ab3a7cd3863aead493db09ec420ffdf2";
+        sha256 = "4b192d63253e8dcc6221ef992ea9ebef7d3555166e8423aa5b553e86bc3c69a2";
       };
 
       beamDeps = [ finch jason mime plug ];
@@ -556,12 +556,12 @@ let
 
     telemetry_metrics = buildMix rec {
       name = "telemetry_metrics";
-      version = "1.1.0";
+      version = "1.2.0";
 
       src = fetchHex {
         pkg = "telemetry_metrics";
         version = "${version}";
-        sha256 = "e7b79e8ddfde70adb6db8a6623d1778ec66401f366e9a8f5dd0955c56bc8ce67";
+        sha256 = "71dde12fc29b58b9c77ec17ec319109e5ca848d010fc1965ed4463bba1837c07";
       };
 
       beamDeps = [ telemetry ];
