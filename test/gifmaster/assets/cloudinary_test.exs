@@ -18,6 +18,24 @@ defmodule Gifmaster.Assets.CloudinaryTest do
     :ok
   end
 
+  test "builds a bounded versioned preview URL" do
+    file = %{
+      provider: :cloudinary,
+      cloudinary_public_id: "gifmaster/test/example",
+      cloudinary_version: "1234",
+      format: "gif"
+    }
+
+    assert "https://res.cloudinary.com/demo/image/upload/c_limit,h_480,w_480,q_auto/v1234/gifmaster/test/example.gif" ==
+             Cloudinary.preview_url(file)
+  end
+
+  test "preserves the original URL for legacy assets" do
+    file = %{provider: :s3, url: %{absolute: "https://gems.gifmaster5000.com/example.gif"}}
+
+    assert "https://gems.gifmaster5000.com/example.gif" == Cloudinary.preview_url(file)
+  end
+
   test "uploads an overwrite and returns reconciliation metadata" do
     Req.Test.stub(__MODULE__, fn conn ->
       {:ok, body, conn} = Plug.Conn.read_body(conn)

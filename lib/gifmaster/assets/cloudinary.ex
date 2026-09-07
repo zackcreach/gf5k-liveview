@@ -5,6 +5,25 @@ defmodule Gifmaster.Assets.Cloudinary do
 
   @default_endpoint "https://api.cloudinary.com/v1_1"
 
+  @spec preview_url(map()) :: String.t() | nil
+  def preview_url(%{
+        provider: :cloudinary,
+        cloudinary_public_id: public_id,
+        cloudinary_version: version,
+        format: format
+      })
+      when is_binary(public_id) and is_binary(version) and is_binary(format) do
+    cloud_name =
+      :gifmaster
+      |> Application.get_env(__MODULE__, [])
+      |> Keyword.fetch!(:cloud_name)
+
+    "https://res.cloudinary.com/#{cloud_name}/image/upload/c_limit,h_480,w_480,q_auto/v#{version}/#{public_id}.#{format}"
+  end
+
+  def preview_url(%{url: %{absolute: absolute}}), do: absolute
+  def preview_url(_file), do: nil
+
   def upload(bytes, options) when is_binary(bytes) do
     with {:ok, config} <- config(),
          {:ok, public_id} <- fetch_option(options, :public_id),

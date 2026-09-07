@@ -38,7 +38,7 @@ defmodule GifmasterWeb.HomeLive do
         <:loading>Loading gifs...</:loading>
         <:failed>Error loading gifs</:failed>
         <div :for={gif <- gifs} :if={gifs} class="flex flex-col">
-          <img src={gif.file.url.absolute} class="object-cover h-[20vh] min-h-12" />
+          <img src={Cloudinary.preview_url(gif.file)} class="object-cover h-[20vh] min-h-12" loading="lazy" decoding="async" />
         </div>
       </.async_result>
     </div>
