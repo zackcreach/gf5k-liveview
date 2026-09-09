@@ -8,14 +8,25 @@ config :bcrypt_elixir, :log_rounds, 1
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :gifmaster, Gifmaster.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  port: String.to_integer(System.get_env("DATABASE_PORT", "5432")),
-  database: "gifmaster_test#{System.get_env("MIX_TEST_PARTITION")}",
-  pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: System.schedulers_online() * 2
+database_config =
+  case System.get_env("DATABASE_SOCKET_DIR") do
+    socket_dir when socket_dir not in [nil, ""] ->
+      [socket_dir: socket_dir]
+
+    _socket_dir ->
+      [hostname: "localhost", port: String.to_integer(System.get_env("DATABASE_PORT", "5432"))]
+  end
+
+config :gifmaster,
+       Gifmaster.Repo,
+       database_config ++
+         [
+           username: System.get_env("DATABASE_USERNAME") || "postgres",
+           password: "postgres",
+           database: "gifmaster_test#{System.get_env("MIX_TEST_PARTITION")}",
+           pool: Ecto.Adapters.SQL.Sandbox,
+           pool_size: System.schedulers_online() * 2
+         ]
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
