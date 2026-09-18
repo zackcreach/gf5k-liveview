@@ -57,7 +57,7 @@ defmodule Gifmaster.Assets.Importer do
   defp reconcile_object(source_bytes, key, object, _mapping) do
     with {:ok, gif} <- matching_gif(key) do
       source_bytes
-      |> reconciled?(object, gif)
+      |> reconciled?(key, object, gif)
       |> reconcile_local(source_bytes, key, gif)
     end
   end
@@ -65,9 +65,9 @@ defmodule Gifmaster.Assets.Importer do
   defp reconcile_local(true, _source_bytes, key, _gif), do: {:skipped, key}
   defp reconcile_local(false, source_bytes, key, gif), do: upload_object(source_bytes, key, gif)
 
-  defp reconciled?(_source_bytes, _object, nil), do: false
+  defp reconciled?(source_bytes, key, _object, nil), do: :ok == LocalStorage.verify(source_bytes, Path.basename(key))
 
-  defp reconciled?(source_bytes, object, %Gif{} = gif) do
+  defp reconciled?(source_bytes, _key, object, %Gif{} = gif) do
     verified?(gif, object) and :ok == LocalStorage.verify_delivery(source_bytes, gif.file.storage_key)
   end
 

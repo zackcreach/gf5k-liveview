@@ -52,6 +52,20 @@ defmodule Gifmaster.Assets.LocalStorage do
     end
   end
 
+  def verify(bytes, filename) when is_binary(bytes) and is_binary(filename) do
+    storage_root = Application.fetch_env!(:gifmaster, :media_storage_root)
+    checksum = Base.encode16(:crypto.hash(:sha256, bytes), case: :lower)
+    storage_key = Path.join(["originals", String.slice(checksum, 0, 2), checksum <> normalized_extension(filename)])
+
+    with {:ok, ^bytes} <- File.read(Path.join(storage_root, storage_key)),
+         {:ok, ^bytes} <- File.read(Path.join([storage_root, "aliases", filename])) do
+      :ok
+    else
+      {:ok, _different_bytes} -> {:error, :delivered_hash_mismatch}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   defp atomic_write(path, bytes) do
     case File.read(path) do
       {:ok, ^bytes} -> :ok

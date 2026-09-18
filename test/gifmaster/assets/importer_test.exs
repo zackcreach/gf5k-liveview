@@ -80,6 +80,17 @@ defmodule Gifmaster.Assets.ImporterTest do
     assert [corrupt_key, missing_key] == Enum.map(failures, & &1.key)
   end
 
+  @tag :tmp_dir
+  test "a repeated archive-only import performs no imports", %{tmp_dir: temporary_directory} do
+    bytes = "GIF89a-archive-only"
+    key = "archive-only.gif"
+    File.write!(Path.join(temporary_directory, key), bytes)
+    inventory = [inventory_entry(key, bytes)]
+
+    assert {:ok, %{imported: 1, skipped: 0}} = Importer.import(inventory, temporary_directory)
+    assert {:ok, %{imported: 0, skipped: 1}} = Importer.import(inventory, temporary_directory)
+  end
+
   defp inventory_entry(key, bytes) do
     %{
       "key" => key,
