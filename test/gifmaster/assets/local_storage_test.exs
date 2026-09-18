@@ -19,6 +19,7 @@ defmodule Gifmaster.Assets.LocalStorageTest do
   test "stores an immutable original and updates the stable alias" do
     assert {:ok, first} = LocalStorage.upload("first", filename: "example.gif")
     assert {:ok, second} = LocalStorage.upload("second", filename: "example.gif")
+    assert {:ok, ^second} = LocalStorage.upload("second", filename: "example.gif")
 
     refute first.storage_key == second.storage_key
     assert first.checksum == first.version
@@ -26,6 +27,12 @@ defmodule Gifmaster.Assets.LocalStorageTest do
 
     assert {:ok, "second"} =
              File.read(Path.join(Application.fetch_env!(:gifmaster, :media_storage_root), "aliases/example.gif"))
+
+    assert [] ==
+             :gifmaster
+             |> Application.fetch_env!(:media_storage_root)
+             |> Path.join("aliases/*.tmp")
+             |> Path.wildcard()
   end
 
   test "rejects alias traversal" do

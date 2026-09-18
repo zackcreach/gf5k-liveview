@@ -93,6 +93,7 @@ defmodule Gifmaster.Assets.LocalStorage do
 
     with :ok <- File.ln(original_path, temporary_path),
          :ok <- File.rename(temporary_path, alias_path) do
+      File.rm(temporary_path)
       :ok
     else
       {:error, reason} ->
