@@ -1,8 +1,8 @@
 defmodule Mix.Tasks.Assets.Reconcile do
-  @shortdoc "Reconciles legacy S3 assets with Cloudinary"
+  @shortdoc "Reconciles legacy S3 assets with local media storage"
 
   @moduledoc """
-  Imports an S3 inventory and archive into Cloudinary.
+  Imports an S3 inventory and archive into local content-addressed storage.
 
       mix assets.reconcile inventory.json archive-directory mapping.json
   """
@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Assets.Reconcile do
     Mix.Task.run("app.start")
 
     inventory = inventory_path |> File.read!() |> Jason.decode!()
-    mapping_path = List.first(mapping_paths) || "cloudinary-proxy-mapping.json"
+    mapping_path = List.first(mapping_paths) || "media-proxy-mapping.json"
     existing_mapping = read_mapping(mapping_path)
 
     case Gifmaster.Assets.Importer.import(inventory, archive_directory, existing_mapping) do
@@ -49,5 +49,5 @@ defmodule Mix.Tasks.Assets.Reconcile do
 
   defp mapping_route(key, [key | _fallback_keys]), do: "/__archive/#{key}"
   defp mapping_route(key, [_fallback_key | fallback_keys]), do: mapping_route(key, fallback_keys)
-  defp mapping_route(key, []), do: "/image/upload/gifmaster/prod/#{Path.rootname(key)}#{Path.extname(key)}"
+  defp mapping_route(key, []), do: "/#{key}"
 end

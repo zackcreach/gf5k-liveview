@@ -6,6 +6,8 @@ defmodule GifmasterWeb.HomeLive do
 
   alias Ecto.Changeset
   alias Gifmaster.Assets.Cloudinary
+  alias Gifmaster.Assets.LocalStorage
+  alias Gifmaster.Assets.Url
   alias Gifmaster.Catalog
   alias Gifmaster.Catalog.Gif
   alias Phoenix.HTML.Form
@@ -38,7 +40,7 @@ defmodule GifmasterWeb.HomeLive do
         <:loading>Loading gifs...</:loading>
         <:failed>Error loading gifs</:failed>
         <div :for={gif <- gifs} :if={gifs} class="flex flex-col">
-          <img src={Cloudinary.preview_url(gif.file)} class="object-cover h-[20vh] min-h-12" loading="lazy" decoding="async" />
+          <img src={preview_url(gif.file)} class="object-cover h-[20vh] min-h-12" loading="lazy" decoding="async" />
         </div>
       </.async_result>
     </div>
@@ -215,7 +217,7 @@ defmodule GifmasterWeb.HomeLive do
 
     with {:ok, bytes} <- File.read(path),
          {:ok, metadata} <-
-           Cloudinary.upload(bytes,
+           LocalStorage.upload(bytes,
              filename: key,
              content_type: entry.client_type,
              public_id: public_id
@@ -239,4 +241,9 @@ defmodule GifmasterWeb.HomeLive do
     domain = Application.fetch_env!(:gifmaster, :public_asset_domain)
     %{url: %{relative: "/#{key}", absolute: "https://#{domain}/#{key}"}}
   end
+
+  defp preview_url(%{storage_key: storage_key, version: version}) when is_binary(storage_key) and is_binary(version),
+    do: Url.animated_preview_url(storage_key, version)
+
+  defp preview_url(file), do: Cloudinary.preview_url(file)
 end

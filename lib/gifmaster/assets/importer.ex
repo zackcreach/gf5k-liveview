@@ -1,11 +1,11 @@
 defmodule Gifmaster.Assets.Importer do
   @moduledoc """
-  Reconciles an exported S3 inventory and local archive with Cloudinary.
+  Reconciles an exported S3 inventory and local archive with local storage.
   """
 
   import Ecto.Query
 
-  alias Gifmaster.Assets.Cloudinary
+  alias Gifmaster.Assets.LocalStorage
   alias Gifmaster.Catalog.Gif
   alias Gifmaster.Repo
 
@@ -54,29 +54,21 @@ defmodule Gifmaster.Assets.Importer do
     end
   end
 
-  defp reconcile_object(source_bytes, key, object, mapping) do
-    case Map.get(mapping, "/#{key}") do
-      "/__archive/" <> ^key ->
-        {:fallback, key, :configured}
-
-      _cloudinary_route ->
-        with {:ok, gif} <- matching_gif(key) do
-          source_bytes
-          |> reconciled?(key, object, gif)
-          |> reconcile_cloudinary(source_bytes, key, gif)
-        end
+  defp reconcile_object(source_bytes, key, object, _mapping) do
+    with {:ok, gif} <- matching_gif(key) do
+      source_bytes
+      |> reconciled?(object, gif)
+      |> reconcile_local(source_bytes, key, gif)
     end
   end
 
-  defp reconcile_cloudinary(true, _source_bytes, key, _gif), do: {:skipped, key}
-  defp reconcile_cloudinary(false, source_bytes, key, gif), do: upload_object(source_bytes, key, gif)
+  defp reconcile_local(true, _source_bytes, key, _gif), do: {:skipped, key}
+  defp reconcile_local(false, source_bytes, key, gif), do: upload_object(source_bytes, key, gif)
 
-  defp reconciled?(source_bytes, key, _object, nil) do
-    :ok == Cloudinary.verify_delivery(source_bytes, key)
-  end
+  defp reconciled?(_source_bytes, _object, nil), do: false
 
-  defp reconciled?(source_bytes, key, object, %Gif{} = gif) do
-    verified?(gif, object) and :ok == Cloudinary.verify_delivery(source_bytes, key)
+  defp reconciled?(source_bytes, object, %Gif{} = gif) do
+    verified?(gif, object) and :ok == LocalStorage.verify_delivery(source_bytes, gif.file.storage_key)
   end
 
   defp upload_object(source_bytes, key, gif) do
@@ -85,13 +77,14 @@ defmodule Gifmaster.Assets.Importer do
          {:ok, persisted_asset} <- persist_asset(gif, key, metadata) do
       {:imported, key, persisted_asset}
     else
-      {:error, reason} -> {:fallback, key, reason}
+      {:error, reason} -> {:failed, key, reason}
     end
   end
 
   defp verified?(%Gif{file: file}, object) do
-    file.provider == :cloudinary and
-      is_binary(file.cloudinary_asset_id) and
+    file.provider == :local and
+      is_binary(file.storage_key) and
+      is_binary(file.checksum) and
       verified_byte_count?(file.byte_count, object)
   end
 
@@ -99,42 +92,26 @@ defmodule Gifmaster.Assets.Importer do
   defp verified_byte_count?(_byte_count, _object), do: true
 
   defp upload(bytes, key) do
-    Cloudinary.upload(bytes,
+    LocalStorage.upload(bytes,
       filename: Path.basename(key),
       content_type: MIME.from_path(key),
       public_id: Path.rootname(key)
     )
   end
 
-  defp verify_delivery(source_bytes, %{delivery_url: delivery_url}) do
-    case Req.get(delivery_url, decode_body: false, max_retries: 2) do
-      {:ok, %Req.Response{status: 200, body: delivered_bytes}} ->
-        if :crypto.hash(:sha256, source_bytes) == :crypto.hash(:sha256, delivered_bytes) do
-          :ok
-        else
-          {:error, :delivered_hash_mismatch}
-        end
+  defp verify_delivery(source_bytes, %{storage_key: storage_key}),
+    do: LocalStorage.verify_delivery(source_bytes, storage_key)
 
-      {:ok, %Req.Response{status: status}} ->
-        {:error, {:delivery_http_error, status}}
-
-      {:error, reason} ->
-        {:error, {:delivery_failed, reason}}
-    end
-  end
-
-  defp verify_delivery(_source_bytes, _metadata), do: {:error, :delivery_url_missing}
+  defp verify_delivery(_source_bytes, _metadata), do: {:error, :storage_key_missing}
 
   defp update_gif(gif, key, metadata) do
     domain = Application.fetch_env!(:gifmaster, :public_asset_domain)
 
     file =
-      metadata
-      |> Map.drop([:delivery_url, :delivery_etag])
-      |> Map.put(:url, %{
-        relative: "/#{key}",
-        absolute: "https://#{domain}/#{key}"
-      })
+      gif.file
+      |> Map.from_struct()
+      |> Map.merge(metadata)
+      |> Map.put(:url, %{relative: "/#{key}", absolute: "https://#{domain}/#{key}"})
 
     gif
     |> Ecto.Changeset.change()
@@ -153,12 +130,11 @@ defmodule Gifmaster.Assets.Importer do
 
   defp summarize(results) do
     failures = Enum.filter(results, &match?({:failed, _key, _reason}, &1))
-    fallbacks = Enum.filter(results, &match?({:fallback, _key, _reason}, &1))
 
     summary = %{
       imported: Enum.count(results, &match?({:imported, _key, _file}, &1)),
       skipped: Enum.count(results, &match?({:skipped, _key}, &1)),
-      fallback: Enum.map(fallbacks, fn {:fallback, key, _reason} -> key end),
+      fallback: [],
       failed:
         Enum.map(failures, fn {:failed, key, reason} ->
           %{key: key, reason: inspect(reason, limit: :infinity)}

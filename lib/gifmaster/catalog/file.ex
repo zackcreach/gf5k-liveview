@@ -18,7 +18,10 @@ defmodule Gifmaster.Catalog.File do
   @primary_key false
   embedded_schema do
     field :bucket, :string
-    field :provider, Ecto.Enum, values: [:s3, :cloudinary]
+    field :provider, Ecto.Enum, values: [:s3, :cloudinary, :local]
+    field :storage_key, :string
+    field :checksum, :string
+    field :version, :string
     field :cloudinary_public_id, :string
     field :cloudinary_asset_id, :string
     field :cloudinary_version, :string
@@ -34,6 +37,9 @@ defmodule Gifmaster.Catalog.File do
     |> cast(params, [
       :bucket,
       :provider,
+      :storage_key,
+      :checksum,
+      :version,
       :cloudinary_public_id,
       :cloudinary_asset_id,
       :cloudinary_version,

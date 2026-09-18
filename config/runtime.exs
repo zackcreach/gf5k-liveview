@@ -88,6 +88,16 @@ if config_env() == :prod do
     api_secret: cloudinary_api_secret,
     folder: System.get_env("CLOUDINARY_FOLDER", "gifmaster/prod")
 
+  media_base_url = System.fetch_env!("MEDIA_BASE_URL")
+
+  config :imgproxy,
+    prefix: "#{media_base_url}/transform",
+    key: System.fetch_env!("IMGPROXY_KEY"),
+    salt: System.fetch_env!("IMGPROXY_SALT")
+
+  config :gifmaster, :media_base_url, media_base_url
+  config :gifmaster, :media_storage_root, System.fetch_env!("MEDIA_STORAGE_ROOT")
+
   config :gifmaster, GifmasterWeb.Endpoint,
     url: [host: host, port: url_port, scheme: scheme],
     check_origin: check_origin,

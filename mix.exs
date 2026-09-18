@@ -48,6 +48,7 @@ defmodule Gifmaster.MixProject do
       {:heroicons,
        github: "tailwindlabs/heroicons", tag: "v2.1.1", sparse: "optimized", app: false, compile: false, depth: 1},
       {:jason, "~> 1.2"},
+      {:imgproxy, "~> 3.1"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_html, "~> 4.1"},
