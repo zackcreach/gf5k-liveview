@@ -192,12 +192,12 @@ let
 
     finch = buildMix rec {
       name = "finch";
-      version = "0.23.0";
+      version = "0.24.0";
 
       src = fetchHex {
         pkg = "finch";
         version = "${version}";
-        sha256 = "80e58d3f936f57e3fdf404f83a3642897ae6d9fb642934e46da4d8fe761b99d5";
+        sha256 = "33ba40069c3587c2f99f9125b766e19dad87d6d54be3c6961db2304df04cef00";
       };
 
       beamDeps = [ mime mint nimble_options nimble_pool telemetry ];
@@ -231,12 +231,12 @@ let
 
     hpax = buildMix rec {
       name = "hpax";
-      version = "1.0.4";
+      version = "1.1.0";
 
       src = fetchHex {
         pkg = "hpax";
         version = "${version}";
-        sha256 = "afc7cb142ebcc2d01ce7816190b98ce5dd49e799111b24249f3443d730f377ca";
+        sha256 = "0b8d0f05832f55571d65ac720f79bf8994138ffbb133209dc4685eae0ad456a8";
       };
 
       beamDeps = [];
@@ -296,12 +296,12 @@ let
 
     mint = buildMix rec {
       name = "mint";
-      version = "1.10.1";
+      version = "1.11.0";
 
       src = fetchHex {
         pkg = "mint";
         version = "${version}";
-        sha256 = "0ba2a904605ed8406393444fb8b3356dc58eb59ee6c7fb94ac3f015e1be129e8";
+        sha256 = "c6279ba2d6aa3a383a1d4cfbe7b59f42e6efd400f58d8e2acfeac48a438693ab";
       };
 
       beamDeps = [ castore hpax ];
