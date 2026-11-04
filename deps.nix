@@ -101,12 +101,12 @@ let
 
     ecto = buildMix rec {
       name = "ecto";
-      version = "3.14.2";
+      version = "3.14.3";
 
       src = fetchHex {
         pkg = "ecto";
         version = "${version}";
-        sha256 = "25d60b8c816a07d19d85b80bdf60978bd8b102209dda198d768cd7c6745339a6";
+        sha256 = "da2548bd3ced0f56c27d54255389bbbb8f110150ce15cffc95ec0cafa364465c";
       };
 
       beamDeps = [ decimal jason telemetry ];
@@ -205,12 +205,12 @@ let
 
     floki = buildMix rec {
       name = "floki";
-      version = "0.38.4";
+      version = "0.38.5";
 
       src = fetchHex {
         pkg = "floki";
         version = "${version}";
-        sha256 = "bdb34645eee8e79845c7edaca2d4099a52804ee4d4a3ecc683a69451f0244973";
+        sha256 = "c8c5b04455f01b076cd489fee7dc26b49edf9851ef61146e743f4676114bf6b0";
       };
 
       beamDeps = [];
@@ -309,12 +309,12 @@ let
 
     nimble_options = buildMix rec {
       name = "nimble_options";
-      version = "1.1.1";
+      version = "1.2.0";
 
       src = fetchHex {
         pkg = "nimble_options";
         version = "${version}";
-        sha256 = "821b2470ca9442c4b6984882fe9bb0389371b8ddec4d45a9504f00a66f650b44";
+        sha256 = "3a784a75ef9e407619c8c9e98239b1acd29216deb737044a8c1063e2671ce6d9";
       };
 
       beamDeps = [];
@@ -530,12 +530,12 @@ let
 
     swoosh = buildMix rec {
       name = "swoosh";
-      version = "1.29.0";
+      version = "1.29.3";
 
       src = fetchHex {
         pkg = "swoosh";
         version = "${version}";
-        sha256 = "d23ea419c6c67604628c0e93a8d5c6d13bcc442137870671e1b05325b2956a13";
+        sha256 = "844719cc70ba28b1c042461ddafbbd5088c485ccd89aa84ef5bfc65b84345d20";
       };
 
       beamDeps = [ bandit finch idna jason mime plug req telemetry ];
