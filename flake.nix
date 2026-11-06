@@ -74,9 +74,11 @@
           inherit version mixNixDeps;
           src = source;
           nativeBuildInputs = [ dependencyFreshness ];
-          HEROICONS_PATH = "${heroicons}/optimized";
-          MIX_ESBUILD_PATH = "${pkgs.esbuild}/bin/esbuild";
-          MIX_TAILWIND_PATH = "${pkgs.tailwindcss}/bin/tailwindcss";
+          env = {
+            HEROICONS_PATH = "${heroicons}/optimized";
+            MIX_ESBUILD_PATH = "${pkgs.esbuild}/bin/esbuild";
+            MIX_TAILWIND_PATH = "${pkgs.tailwindcss}/bin/tailwindcss";
+          };
           postBuild = ''
             mix do deps.loadpaths --no-deps-check + tailwind gifmaster --minify + esbuild gifmaster --minify + phx.digest
           '';
